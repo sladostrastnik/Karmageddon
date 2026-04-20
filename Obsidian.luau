@@ -1,3 +1,20 @@
+--[[
+
+    modified by Sladostrastnik
+
+        [18/04/2026]:
+            built in SaveManager and ThemeManager
+            added visibility management for dividers
+
+        [20/04/2026]:
+            improved configuration for dividers
+            fixed initial visibility for buttons
+            added text changing for dividers
+            added text alignment for slider bars
+        
+    
+]]--
+
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
@@ -4230,24 +4247,18 @@ local BaseGroupbox = {}
 do
     local Funcs = {}
 
-    function Funcs:AddDivider(Info)
-        Info = Info or {}
+    function Funcs:AddDivider(Params)
+        Params = Params or {}
 
-        local Text
-        local Visible = true
-        local MarginTop = 0
-        local MarginBottom = 0
-
-        if typeof(Info) == "table" then
-            if typeof(Info.Visible) == "boolean" then
-                Visible = Info.Visible
-            end
-            Text = Info.Text
-            MarginTop = Info.MarginTop or Info.Margin or 0
-            MarginBottom = Info.MarginBottom or Info.Margin or 0
-        elseif typeof(Info) == "string" then
-            Visible = true
-            Text = Info
+        local Info = {}
+        if typeof(Params) == "table" then
+            Info.Visible = Params.Visible ~= false
+            Info.Text = Params.Text
+            Info.MarginTop = Params.MarginTop or Params.Margin or 0
+            Info.MarginBottom = Params.MarginBottom or Params.Margin or 0
+        elseif typeof(Params) == "string" then
+            Info.Visible = true
+            Info.Text = Params
         end
 
         local Groupbox = self
@@ -4256,7 +4267,7 @@ do
         local Holder = New("Frame", {
             Visible = Info.Visible,
             BackgroundTransparency = 1,
-            Size = UDim2.new(1, 0, 0, 6 + MarginTop + MarginBottom),
+            Size = UDim2.new(1, 0, 0, 6 + Info.MarginTop + Info.MarginBottom),
             Parent = Container,
         })
 
@@ -4268,44 +4279,59 @@ do
         })
 
         New("UIPadding", {
-            PaddingTop = UDim.new(0, MarginTop),
-            PaddingBottom = UDim.new(0, MarginBottom),
+            PaddingTop = UDim.new(0, Info.MarginTop),
+            PaddingBottom = UDim.new(0, Info.MarginBottom),
             Parent = Holder,
         })
 
-        if Text then
+        local Divider = {
+            Holder = Holder,
+            Text = Info.Text,
+            MarginTop = Info.MarginTop,
+            MarginBottom = Info.MarginBottom,
+            Type = "Divider",
+        }
+
+        if Info.Text and typeof(Info.Text) == "string" then
             local TextLabel = New("TextLabel", {
                 AutomaticSize = Enum.AutomaticSize.X,
                 BackgroundTransparency = 1,
                 Size = UDim2.fromScale(1, 0),
-                Text = Text,
+                Text = Info.Text,
                 TextSize = 14,
                 TextTransparency = 0.5,
                 TextXAlignment = Enum.TextXAlignment.Center,
                 Parent = InnerHolder,
             })
 
-            local X, _ = Library:GetTextBounds(Text, TextLabel.FontFace, TextLabel.TextSize, TextLabel.AbsoluteSize.X)
-            local SizeX = X // 2 + 10
-
-            New("Frame", {
+            local Left = New("Frame", {
                 AnchorPoint = Vector2.new(0, 0.5),
                 BackgroundColor3 = "MainColor",
                 BorderColor3 = "OutlineColor",
                 BorderSizePixel = 1,
                 Position = UDim2.fromScale(0, 0.5),
-                Size = UDim2.new(0.5, -SizeX, 0, 2),
                 Parent = InnerHolder,
             })
-            New("Frame", {
+            local Right = New("Frame", {
                 AnchorPoint = Vector2.new(1, 0.5),
                 BackgroundColor3 = "MainColor",
                 BorderColor3 = "OutlineColor",
                 BorderSizePixel = 1,
                 Position = UDim2.fromScale(1, 0.5),
-                Size = UDim2.new(0.5, -SizeX, 0, 2),
                 Parent = InnerHolder,
             })
+
+            function Divider:SetText(Text: string)
+                Divider.Text = Text
+
+                local Size = UDim2.new(0.5, -(Library:GetTextBounds(Text, TextLabel.FontFace, TextLabel.TextSize, TextLabel.AbsoluteSize.X) // 2 + 10), 0, 2)
+
+                TextLabel.Text = Text
+                Left.Size = Size
+                Right.Size = Size
+            end
+
+            Divider:SetText(Info.Text)
         else
             New("Frame", {
                 AnchorPoint = Vector2.new(0, 0.5),
@@ -4318,21 +4344,13 @@ do
             })
         end
 
-        Groupbox:Resize()
-
-        local Divider = {
-            Holder = Holder,
-            Text = Text,
-            MarginTop = MarginTop,
-            MarginBottom = MarginBottom,
-            Type = "Divider",
-        }
-
         function Divider:SetVisible(Visible: boolean)
             Holder.Visible = Visible
             InnerHolder.Visible = Visible
             Groupbox:Resize()
         end
+
+        Divider:SetVisible(Info.Visible)
 
         table.insert(Groupbox.Elements, Divider)
         return Divider
@@ -4351,7 +4369,7 @@ do
             Data.Text = Params.Text or ""
             Data.DoesWrap = Params.DoesWrap or false
             Data.Size = Params.Size or 14
-            Data.Visible = Params.Visible or true
+            Data.Visible = Params.Visible ~= false
             Data.Idx = typeof(Second) == "table" and First or nil
         else
             Data.Text = First or ""
@@ -4470,7 +4488,7 @@ do
 
                 Info.Risky = Params.Risky or false
                 Info.Disabled = Params.Disabled or false
-                Info.Visible = Params.Visible or true
+                Info.Visible = Params.Visible ~= false
                 Info.Idx = typeof(Second) == "table" and First or nil
             else
                 Info.Text = First or ""
@@ -4531,7 +4549,7 @@ do
                 Text = Button.Text,
                 TextSize = 14,
                 TextTransparency = 0.4,
-                Visible = Button.Visible,
+                Visible = true,
                 Parent = Holder,
             })
 
@@ -4721,8 +4739,7 @@ do
 
         function Button:SetVisible(Visible: boolean)
             Button.Visible = Visible
-
-            Holder.Visible = Button.Visible
+            Holder.Visible = Visible
             Groupbox:Resize()
         end
 
@@ -4742,7 +4759,7 @@ do
         end
 
         Button:UpdateColors()
-        Groupbox:Resize()
+        Button:SetVisible(Info.Visible)
 
         Button.Holder = Holder
         table.insert(Groupbox.Elements, Button)
@@ -5391,6 +5408,7 @@ do
             Prefix = Info.Prefix,
             Suffix = Info.Suffix,
             Compact = Info.Compact,
+            Alignment = Info.Alignment,
             Rounding = Info.Rounding,
             HideMax = Info.HideMax,
 
@@ -5442,6 +5460,7 @@ do
         })
 
         local DisplayLabel = New("TextLabel", {
+            TextXAlignment = Enum.TextXAlignment[Slider.Alignment or "Center"],
             BackgroundTransparency = 1,
             Size = UDim2.fromScale(1, 1),
             Text = "",
