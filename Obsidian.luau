@@ -11,6 +11,9 @@
             fixed initial visibility for buttons
             added text changing for dividers
             added text alignment for slider bars
+
+        [24/04/2026]:
+            fixed resizing for groupboxes
         
     
 ]]--
@@ -8321,6 +8324,10 @@ function Library:CreateWindow(WindowInfo)
             function Groupbox:Resize()
                 GroupboxHolder.Size = UDim2.new(1, 0, 0, (GroupboxList.AbsoluteContentSize.Y / Library.DPIScale) + 49)
             end
+
+            Library:GiveSignal(GroupboxList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+                Groupbox:Resize()
+            end))
 
             setmetatable(Groupbox, BaseGroupbox)
 
