@@ -1,4 +1,4 @@
-# Karmageddon
+# 🔥 Karmageddon
 **Karmageddon** (рус. *Кармагеддо́н*) — currently a private script and group project of «**Karmageddon**» group. Also the rebirth of **Wexort**.  
   
 ## Script Release
@@ -13,8 +13,8 @@
   
   
   
-# Wexort
-**Wexort** (рус. Векзо́рт) — closed script project made by **Sladostrastnik** and **4art** in 2025.
+# 🪐 Wexort
+**Wexort** (рус. *Векзо́рт*) — closed script project made by **Sladostrastnik** and **4art** in 2025.
 
 ## 2024
 Never released patched script made by **Gree** and **4art** in 2024. Was discontinued after *the kick grab patch* (network ownership exploit). Publicly [leaked](<https://raw.githubusercontent.com/sladostrastnik/OpenSource/refs/heads/main/Games/6961824067/Wexort2024-patched.luau>) by **Sladostrastnik** on 10.12.2026.
