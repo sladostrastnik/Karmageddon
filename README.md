@@ -1,5 +1,5 @@
 # 🔥 Karmageddon
-**Karmageddon** (рус. *Кармагеддо́н*) — currently a private script and group project of «**Karmageddon**» group. Also the rebirth of **Wexort**.  
+**Karmageddon** (рус. *Кармагеддо́н*) — currently a private script and group project of «**Karmageddon**» group. Also the successor of **Wexort**.  
   
 ## Script Release
 **Private.** The script is planned to be released publicly or purchasable in the summer-autumn of 2026. As in the past, the project will be brought to a medium to high level of quality to justify itself.  
