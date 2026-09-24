@@ -24,6 +24,9 @@
 
         [18/07/2026]:
             added icons system for dropdown values
+
+        [25/09/2025]:
+            fixed dropdown values icon duplication
         
     
 ]]--
@@ -6044,6 +6047,7 @@ do
 
         local Buttons = {}
         local Icons = {}
+        local IconLabels = {}
 
         local function CreateIconLabel(Button, IconId: string)
             return New("ImageLabel", {
@@ -6057,15 +6061,32 @@ do
         end
         function Dropdown:AddIcon(Value: string, IconId: string)
             Icons[Value] = IconId
+
+            if IconLabels[Value] then
+                IconLabels[Value]:Destroy()
+                IconLabels[Value] = nil
+            end
+
             local btn = Buttons[Value]
-            if btn then CreateIconLabel(btn.Button, IconId) end
+            if btn then
+                IconLabels[Value] = CreateIconLabel(btn.Button, IconId)
+            end
         end
         function Dropdown:RemoveIcon(Value: any)
             if Value == nil then return end
             Icons[Value] = nil
+
+            if IconLabels[Value] then
+                IconLabels[Value]:Destroy()
+                IconLabels[Value] = nil
+            end
         end
         function Dropdown:UnloadIcons()
             Icons = {}
+            for Value, Label in IconLabels do
+                Label:Destroy()
+            end
+            IconLabels = {}
         end
 
         function Dropdown:BuildDropdownList()
@@ -6137,10 +6158,10 @@ do
                     })
                     
                     Table = {Button = Button, Value = Value}
-                    
+
                     local IconUrl = Icons[Value]
                     if IconUrl then
-                        CreateIconLabel(Button, IconUrl)
+                        IconLabels[Value] = CreateIconLabel(Button, IconUrl)
                     end
                     
                     local Tooltip = Info.Tooltips[Value]
